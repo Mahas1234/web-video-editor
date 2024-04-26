@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebM to MP4 Converter</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #121212; /* Dark background color */
+        color: #fff; /* Text color */
+    }
+    .container {
+        text-align: center;
+    }
+    .button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>WebM to MP4 Converter</h1>
+    <input type="file" accept="video/webm" onchange="handleFileSelect(event)">
+    <button class="button" onclick="convert()">Convert</button>
+    <p id="status"></p>
+</div>
+
+<script>
+let selectedFile;
+
+function handleFileSelect(event) {
+    selectedFile = event.target.files[0];
+}
+
+function convert() {
+    if (!selectedFile) {
+        document.getElementById('status').textContent = 'Please select a WebM file.';
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+        const videoData = event.target.result;
+
+        const videoElement = document.createElement('video');
+        videoElement.src = videoData;
+        videoElement.onloadedmetadata = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = this.videoWidth;
+            canvas.height = this.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(this, 0, 0);
+
+            const convertedData = canvas.toDataURL('image/jpeg', 0.5);
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = convertedData;
+            downloadLink.download = selectedFile.name.replace('.webm', '.mp4');
+            downloadLink.click();
+
+            document.getElementById('status').textContent = 'Conversion completed!';
+        };
+    };
+
+    reader.readAsDataURL(selectedFile);
+}
+</script>
+
+</body>
+</html>
